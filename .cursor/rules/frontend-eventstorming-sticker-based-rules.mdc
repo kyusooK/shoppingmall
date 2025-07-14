@@ -3,7 +3,7 @@ description: EventStorming 스티커 기반으로 UI 컴포넌트를 생성하�
 alwaysApply: false
 ---
 UI에 대한 흐름 및 요구사항은 `@frontend-ui-requirments`를 참고해야합니다.
-
+ 
 ## Command
 0. 필수 참고사항
 반드시 api/openapi.yaml 또는 각 service 폴더 내에 openapi.yaml 파일을 참고하여 axios호출로 진행 및 버튼 구성을 해야합니다.
