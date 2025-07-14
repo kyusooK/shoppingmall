@@ -1,0 +1,1064 @@
+
+openapi: 3.1.0
+info:
+  title: shoppingmall API
+  version: 0.0.1
+  description: API definition of shoppingmall
+  contact:
+    name: creator's name
+    url: http://creator.homepage.address
+    email: creator@creator.com
+  license:
+    name: MIT License
+    url: https://opensource.org/licenses/MIT
+paths:
+  /products:
+    summary: Global operations on products
+    get:
+      tags:
+      - products
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+              examples:
+                value:
+          description: Get list of products
+      operationId: GetProduct
+      summary: Get list of products
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          description: Changed Product
+      operationId: Post Product
+      summary: Post Product        
+  /products/{id}:
+    summary: Specific operation on products
+    get:
+      parameters:
+      - examples:
+          Long:
+            value: Long
+        name: id
+        description: Product name
+        schema:
+          type: Long
+        in: path
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+              examples:
+                value:
+                    productId: 1
+                    name: A string
+                    description: A string
+                    status: value
+                    optionRequiredType: value
+                    createdAt: value
+                    updatedAt: value
+          description: products with specified id
+      operationId: GetProductById
+      summary: Get Product by id
+      description: Get Product by id
+    patch:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          description: Changed Product
+      operationId: PatchProduct
+      summary: Patch existing Product
+    parameters:
+    - name: id
+      description: Product id
+      schema:
+        type: integer
+      in: path
+      required: true
+  /products/{id}registerproductoption:
+    summary: RegisterProductOption operation on products
+    POST:
+      requestBody:
+        content:
+          application/json:
+            schema:      # Request body contents
+              type: object
+              properties:
+                productId:
+                  description: productId of this RegisterProductOption
+                  type: integer
+                size:
+                  description: size of this RegisterProductOption
+                  type: string
+                width:
+                  description: width of this RegisterProductOption
+                  type: string
+                isFlatFooted:
+                  description: isFlatFooted of this RegisterProductOption
+                  type: string
+            examples:
+              Example 0:   
+                value:
+                  isFlatFooted: false
+                  productId: 1001
+                  size: 270
+                  width: D
+              Example 1:   
+                value:
+                  isFlatFooted: false
+                  productId: 1001
+                  size: 270
+                  width: D
+              Example 2:   
+                value:
+                  isFlatFooted: false
+                  productId: 1001
+                  size: 270
+                  width: D
+              Example 3:   
+                value:
+                  isFlatFooted: false
+                  productId: 1001
+                  size: 
+                  width: D
+      parameters:
+      - name: id
+        description: RegisterProductOption name
+        schema:
+          type: integer
+        in: path
+        required: true
+        examples:
+          Example 0:   
+            value:
+              isFlatFooted: false
+              productId: 1001
+              size: 270
+              width: D
+          Example 1:   
+            value:
+              isFlatFooted: false
+              productId: 1001
+              size: 270
+              width: D
+          Example 2:   
+            value:
+              isFlatFooted: false
+              productId: 1001
+              size: 270
+              width: D
+          Example 3:   
+            value:
+              isFlatFooted: false
+              productId: 1001
+              size: 
+              width: D
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+              examples:
+                Example 0: 
+                  value:
+                    isFlatFooted: false
+                    productId: 1001
+                    productOptionId: 2001
+                    size: 270
+                    width: D
+                Example 1: 
+                  value:
+                    initialStockQuantity: 50
+                    productId: 1001
+                    productOptionId: 2001
+                Example 2: 
+                  value:
+                    isFlatFooted: false
+                    productId: 1001
+                    productOptionId: 2001
+                    size: 270
+                    width: D
+                Example 3: 
+                  value:
+                    isFlatFooted: false
+                    productId: 1001
+                    productOptionId: 
+                    size: 
+                    width: D
+          description: RegisterProductOption Operation
+      operationId: RegisterProductOption
+      summary: RegisterProductOption
+      description: RegisterProductOption
+  /products/{id}/modifyproductoption:
+    summary: ModifyProductOption operation on products
+    PATCH:
+      requestBody:
+        content:
+          application/json:
+            schema:      # Request body contents
+              type: object
+              properties:
+                productId:
+                  description: productId of this ModifyProductOption
+                  type: integer
+                productOptionId:
+                  description: productOptionId of this ModifyProductOption
+                  type: integer
+                size:
+                  description: size of this ModifyProductOption
+                  type: string
+                width:
+                  description: width of this ModifyProductOption
+                  type: string
+                isFlatFooted:
+                  description: isFlatFooted of this ModifyProductOption
+                  type: string
+            examples:
+              Example 0:   
+                value:
+                  isFlatFooted: true
+                  productId: 1001
+                  productOptionId: 2001
+                  size: 275
+                  width: E
+              Example 1:   
+                value:
+                  isFlatFooted: true
+                  productId: 1001
+                  productOptionId: 2001
+                  size: 275
+                  width: E
+              Example 2:   
+                value:
+                  isFlatFooted: false
+                  productId: 1001
+                  productOptionId: 9999
+                  size: 280
+                  width: E
+      parameters:
+      - name: id
+        description: ModifyProductOption name
+        schema:
+          type: integer
+        in: path
+        required: true
+        examples:
+          Example 0:   
+            value:
+              isFlatFooted: true
+              productId: 1001
+              productOptionId: 2001
+              size: 275
+              width: E
+          Example 1:   
+            value:
+              isFlatFooted: true
+              productId: 1001
+              productOptionId: 2001
+              size: 275
+              width: E
+          Example 2:   
+            value:
+              isFlatFooted: false
+              productId: 1001
+              productOptionId: 9999
+              size: 280
+              width: E
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+              examples:
+                Example 0: 
+                  value:
+                    isFlatFooted: true
+                    productId: 1001
+                    productOptionId: 2001
+                    size: 275
+                    width: E
+                Example 1: 
+                  value:
+                    isFlatFooted: true
+                    productId: 1001
+                    productOptionId: 2001
+                    size: 275
+                    width: E
+                Example 2: 
+                  value:
+                    isFlatFooted: false
+                    productId: 1001
+                    productOptionId: 9999
+                    size: 280
+                    width: E
+          description: ModifyProductOption Operation
+      operationId: ModifyProductOption
+      summary: ModifyProductOption
+      description: ModifyProductOption
+  /products/{id}/deleteproductoption:
+    summary: DeleteProductOption operation on products
+    DELETE:
+      requestBody:
+        content:
+          application/json:
+            schema:      # Request body contents
+              type: object
+              properties:
+                productId:
+                  description: productId of this DeleteProductOption
+                  type: integer
+                productOptionId:
+                  description: productOptionId of this DeleteProductOption
+                  type: integer
+            examples:
+              Example 0:   
+                value:
+                  productId: 1001
+                  productOptionId: 2001
+              Example 1:   
+                value:
+                  productId: 1001
+                  productOptionId: 2001
+              Example 2:   
+                value:
+                  productId: 1001
+                  productOptionId: 9999
+      parameters:
+      - name: id
+        description: DeleteProductOption name
+        schema:
+          type: integer
+        in: path
+        required: true
+        examples:
+          Example 0:   
+            value:
+              productId: 1001
+              productOptionId: 2001
+          Example 1:   
+            value:
+              productId: 1001
+              productOptionId: 2001
+          Example 2:   
+            value:
+              productId: 1001
+              productOptionId: 9999
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+              examples:
+                Example 0: 
+                  value:
+                    productId: 1001
+                    productOptionId: 2001
+                Example 1: 
+                  value:
+                    isFlatFooted: false
+                    productId: 1001
+                    productOptionId: 2001
+                    size: 270
+                    width: D
+                Example 2: 
+                  value:
+                    productId: 1001
+                    productOptionId: 9999
+          description: DeleteProductOption Operation
+      operationId: DeleteProductOption
+      summary: DeleteProductOption
+      description: DeleteProductOption
+  /productOptions:
+    summary: Global operations on productOptions
+    get:
+      tags:
+      - productOptions
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductOption'
+              examples:
+                value:
+          description: Get list of productOptions
+      operationId: GetProductOption
+      summary: Get list of productOptions
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductOption'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductOption'
+          description: Changed ProductOption
+      operationId: Post ProductOption
+      summary: Post ProductOption        
+  /productOptions/{id}:
+    summary: Specific operation on productOptions
+    get:
+      parameters:
+      - examples:
+          Long:
+            value: Long
+        name: id
+        description: ProductOption name
+        schema:
+          type: Long
+        in: path
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductOption'
+              examples:
+                value:
+                    productOptionId: 1
+                    productId: 1
+                    size: A string
+                    width: A string
+                    isFlatFooted: value
+                    stockQuantity: 1
+                    soldOutStatus: value
+                    createdAt: value
+                    updatedAt: value
+          description: productOptions with specified id
+      operationId: GetProductOptionById
+      summary: Get ProductOption by id
+      description: Get ProductOption by id
+    patch:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductOption'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductOption'
+          description: Changed ProductOption
+      operationId: PatchProductOption
+      summary: Patch existing ProductOption
+    parameters:
+    - name: id
+      description: ProductOption id
+      schema:
+        type: integer
+      in: path
+      required: true
+  /productOptions/{id}/markproductoptionsoldout:
+    summary: MarkProductOptionSoldOut operation on productOptions
+    PATCH:
+      requestBody:
+        content:
+          application/json:
+            schema:      # Request body contents
+              type: object
+              properties:
+                productOptionId:
+                  description: productOptionId of this MarkProductOptionSoldOut
+                  type: integer
+            examples:
+              Example 0:   
+                value:
+                  productOptionId: 1001
+              Example 1:   
+                value:
+                  productOptionId: 1002
+              Example 2:   
+                value:
+                  productOptionId: 1003
+      parameters:
+      - name: id
+        description: MarkProductOptionSoldOut name
+        schema:
+          type: integer
+        in: path
+        required: true
+        examples:
+          Example 0:   
+            value:
+              productOptionId: 1001
+          Example 1:   
+            value:
+              productOptionId: 1002
+          Example 2:   
+            value:
+              productOptionId: 1003
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductOption'
+              examples:
+                Example 0: 
+                  value:
+                    isFlatFooted: false
+                    productId: 2001
+                    productOptionId: 1001
+                    size: 270
+                    soldOutAt: 2024-06-01T10:00:00Z
+                    width: Wide
+                Example 1: 
+                  value:
+                    isFlatFooted: true
+                    productId: 2002
+                    productOptionId: 1002
+                    size: 260
+                    soldOutAt: 2024-06-01T10:00:00Z
+                    width: Regular
+                Example 2: 
+                  value:
+                    isFlatFooted: false
+                    productId: 2003
+                    productOptionId: 1003
+                    size: 255
+                    soldOutAt: 2024-06-01T10:00:00Z
+                    width: Narrow
+          description: MarkProductOptionSoldOut Operation
+      operationId: MarkProductOptionSoldOut
+      summary: MarkProductOptionSoldOut
+      description: MarkProductOptionSoldOut
+  /inventoryStocks:
+    summary: Global operations on inventoryStocks
+    get:
+      tags:
+      - inventoryStocks
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InventoryStock'
+              examples:
+                value:
+          description: Get list of inventoryStocks
+      operationId: GetInventoryStock
+      summary: Get list of inventoryStocks
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryStock'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryStock'
+          description: Changed InventoryStock
+      operationId: Post InventoryStock
+      summary: Post InventoryStock        
+  /inventoryStocks/{id}:
+    summary: Specific operation on inventoryStocks
+    get:
+      parameters:
+      - examples:
+          Long:
+            value: Long
+        name: id
+        description: InventoryStock name
+        schema:
+          type: Long
+        in: path
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryStock'
+              examples:
+                value:
+                    inventoryStockId: 1
+                    productId: 1
+                    size: A string
+                    width: A string
+                    isFlatFooted: value
+                    stockQuantity: 1
+                    status: value
+                    createdAt: value
+                    updatedAt: value
+                    productOptionId: value
+          description: inventoryStocks with specified id
+      operationId: GetInventoryStockById
+      summary: Get InventoryStock by id
+      description: Get InventoryStock by id
+    patch:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryStock'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryStock'
+          description: Changed InventoryStock
+      operationId: PatchInventoryStock
+      summary: Patch existing InventoryStock
+    parameters:
+    - name: id
+      description: InventoryStock id
+      schema:
+        type: integer
+      in: path
+      required: true
+  /inventoryStocks/{id}/modifyproductoptionstock:
+    summary: ModifyProductOptionStock operation on inventoryStocks
+    PATCH:
+      requestBody:
+        content:
+          application/json:
+            schema:      # Request body contents
+              type: object
+              properties:
+                inventoryStockId:
+                  description: inventoryStockId of this ModifyProductOptionStock
+                  type: integer
+                modifiedStockQuantity:
+                  description: modifiedStockQuantity of this ModifyProductOptionStock
+                  type: integer
+            examples:
+              Example 0:   
+                value:
+                  inventoryStockId: 1002
+                  modifiedStockQuantity: 5
+              Example 1:   
+                value:
+                  inventoryStockId: 1003
+                  modifiedStockQuantity: 10
+      parameters:
+      - name: id
+        description: ModifyProductOptionStock name
+        schema:
+          type: integer
+        in: path
+        required: true
+        examples:
+          Example 0:   
+            value:
+              inventoryStockId: 1002
+              modifiedStockQuantity: 5
+          Example 1:   
+            value:
+              inventoryStockId: 1003
+              modifiedStockQuantity: 10
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryStock'
+              examples:
+                Example 0: 
+                  value:
+                    inventoryStockId: 1002
+                    modifiedAt: 2024-06-01T10:00:00Z
+                    productId: 2002
+                    productOptionId: 3002
+                    stockQuantity: 5
+                Example 1: 
+                  value:
+                    inventoryStockId: 1003
+                    modifiedAt: 2024-06-01T10:00:00Z
+                    productId: 2003
+                    productOptionId: 3003
+                    stockQuantity: 10
+          description: ModifyProductOptionStock Operation
+      operationId: ModifyProductOptionStock
+      summary: ModifyProductOptionStock
+      description: ModifyProductOptionStock
+  /inventoryStocks/{id}initializeproductoptionstock:
+    summary: InitializeProductOptionStock operation on inventoryStocks
+    POST:
+      requestBody:
+        content:
+          application/json:
+            schema:      # Request body contents
+              type: object
+              properties:
+                inventoryStockId:
+                  description: inventoryStockId of this InitializeProductOptionStock
+                  type: integer
+                productId:
+                  description: productId of this InitializeProductOptionStock
+                  type: integer
+                productOptionId:
+                  description: productOptionId of this InitializeProductOptionStock
+                  type: string
+                size:
+                  description: size of this InitializeProductOptionStock
+                  type: string
+                width:
+                  description: width of this InitializeProductOptionStock
+                  type: string
+                isFlatFooted:
+                  description: isFlatFooted of this InitializeProductOptionStock
+                  type: string
+                initialStockQuantity:
+                  description: initialStockQuantity of this InitializeProductOptionStock
+                  type: integer
+            examples:
+              Example 0:   
+                value:
+                  initialStockQuantity: 20
+                  inventoryStockId: 1001
+                  isFlatFooted: false
+                  productId: 2001
+                  productOptionId: [object Object]
+                  size: 260
+                  width: Wide
+      parameters:
+      - name: id
+        description: InitializeProductOptionStock name
+        schema:
+          type: integer
+        in: path
+        required: true
+        examples:
+          Example 0:   
+            value:
+              initialStockQuantity: 20
+              inventoryStockId: 1001
+              isFlatFooted: false
+              productId: 2001
+              productOptionId: [object Object]
+              size: 260
+              width: Wide
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryStock'
+              examples:
+                Example 0: 
+                  value:
+                    initialStockQuantity: 20
+                    productId: 2001
+                    productOptionId: 3001
+          description: InitializeProductOptionStock Operation
+      operationId: InitializeProductOptionStock
+      summary: InitializeProductOptionStock
+      description: InitializeProductOptionStock
+  /inventoryStocks/{id}increaseoptionstock:
+    summary: IncreaseOptionStock operation on inventoryStocks
+    POST:
+      requestBody:
+        content:
+          application/json:
+            schema:      # Request body contents
+              type: object
+              properties:
+                inventoryStockId:
+                  description: inventoryStockId of this IncreaseOptionStock
+                  type: integer
+                increasedQuantity:
+                  description: increasedQuantity of this IncreaseOptionStock
+                  type: integer
+                reason:
+                  description: reason of this IncreaseOptionStock
+                  type: string
+            examples:
+              Example 0:   
+                value:
+                  increasedQuantity: 5
+                  inventoryStockId: 1006
+                  reason: 반품 처리
+      parameters:
+      - name: id
+        description: IncreaseOptionStock name
+        schema:
+          type: integer
+        in: path
+        required: true
+        examples:
+          Example 0:   
+            value:
+              increasedQuantity: 5
+              inventoryStockId: 1006
+              reason: 반품 처리
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryStock'
+              examples:
+                Example 0: 
+                  value:
+                    increasedAt: 2024-06-01T10:03:00Z
+                    increasedQuantity: 5
+                    inventoryStockId: 1006
+                    productId: 2006
+                    productOptionId: 3006
+                    reason: 반품 처리
+                    stockQuantity: 5
+          description: IncreaseOptionStock Operation
+      operationId: IncreaseOptionStock
+      summary: IncreaseOptionStock
+      description: IncreaseOptionStock
+  /inventoryStocks/{id}decreaseoptionstock:
+    summary: DecreaseOptionStock operation on inventoryStocks
+    POST:
+      requestBody:
+        content:
+          application/json:
+            schema:      # Request body contents
+              type: object
+              properties:
+                inventoryStockId:
+                  description: inventoryStockId of this DecreaseOptionStock
+                  type: integer
+                decreasedQuantity:
+                  description: decreasedQuantity of this DecreaseOptionStock
+                  type: integer
+                orderId:
+                  description: orderId of this DecreaseOptionStock
+                  type: integer
+            examples:
+              Example 0:   
+                value:
+                  decreasedQuantity: 2
+                  inventoryStockId: 1004
+                  orderId: 4001
+              Example 1:   
+                value:
+                  decreasedQuantity: 1
+                  inventoryStockId: 1005
+                  orderId: 4002
+      parameters:
+      - name: id
+        description: DecreaseOptionStock name
+        schema:
+          type: integer
+        in: path
+        required: true
+        examples:
+          Example 0:   
+            value:
+              decreasedQuantity: 2
+              inventoryStockId: 1004
+              orderId: 4001
+          Example 1:   
+            value:
+              decreasedQuantity: 1
+              inventoryStockId: 1005
+              orderId: 4002
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryStock'
+              examples:
+                Example 0: 
+                  value:
+                    decreasedAt: 2024-06-01T10:01:00Z
+                    decreasedQuantity: 2
+                    inventoryStockId: 1004
+                    orderId: 4001
+                    productId: 2004
+                    productOptionId: 3004
+                    stockQuantity: 3
+                Example 1: 
+                  value:
+                    decreasedAt: 2024-06-01T10:02:00Z
+                    decreasedQuantity: 1
+                    inventoryStockId: 1005
+                    orderId: 4002
+                    productId: 2005
+                    productOptionId: 3005
+                    stockQuantity: 0
+          description: DecreaseOptionStock Operation
+      operationId: DecreaseOptionStock
+      summary: DecreaseOptionStock
+      description: DecreaseOptionStock
+components:
+  schemas:
+    Product:
+      title: Root Type for Product
+      description: The root of the Product type's schema.
+      type: object
+      properties:
+        productId:
+          description: productId of this Product
+          type: integer
+        name:
+          description: name of this Product
+          type: string
+        description:
+          description: description of this Product
+          type: string
+        status:
+          description: status of this Product
+          type: string
+        optionRequiredType:
+          description: optionRequiredType of this Product
+          type: string
+        createdAt:
+          description: createdAt of this Product
+          type: string
+        updatedAt:
+          description: updatedAt of this Product
+          type: string
+      example:
+        productId: 1
+        name: A string
+        description: A string
+        status: value
+        optionRequiredType: value
+        createdAt: value
+        updatedAt: value
+tags:
+- name: Product
+  description: Product resource
+components:
+  schemas:
+    ProductOption:
+      title: Root Type for ProductOption
+      description: The root of the ProductOption type's schema.
+      type: object
+      properties:
+        productOptionId:
+          description: productOptionId of this ProductOption
+          type: integer
+        productId:
+          description: productId of this ProductOption
+          type: integer
+        size:
+          description: size of this ProductOption
+          type: string
+        width:
+          description: width of this ProductOption
+          type: string
+        isFlatFooted:
+          description: isFlatFooted of this ProductOption
+          type: string
+        stockQuantity:
+          description: stockQuantity of this ProductOption
+          type: integer
+        soldOutStatus:
+          description: soldOutStatus of this ProductOption
+          type: string
+        createdAt:
+          description: createdAt of this ProductOption
+          type: string
+        updatedAt:
+          description: updatedAt of this ProductOption
+          type: string
+      example:
+        productOptionId: 1
+        productId: 1
+        size: A string
+        width: A string
+        isFlatFooted: value
+        stockQuantity: 1
+        soldOutStatus: value
+        createdAt: value
+        updatedAt: value
+tags:
+- name: ProductOption
+  description: ProductOption resource
+components:
+  schemas:
+    InventoryStock:
+      title: Root Type for InventoryStock
+      description: The root of the InventoryStock type's schema.
+      type: object
+      properties:
+        inventoryStockId:
+          description: inventoryStockId of this InventoryStock
+          type: integer
+        productId:
+          description: productId of this InventoryStock
+          type: integer
+        size:
+          description: size of this InventoryStock
+          type: string
+        width:
+          description: width of this InventoryStock
+          type: string
+        isFlatFooted:
+          description: isFlatFooted of this InventoryStock
+          type: string
+        stockQuantity:
+          description: stockQuantity of this InventoryStock
+          type: integer
+        status:
+          description: status of this InventoryStock
+          type: string
+        createdAt:
+          description: createdAt of this InventoryStock
+          type: string
+        updatedAt:
+          description: updatedAt of this InventoryStock
+          type: string
+        productOptionId:
+          description: productOptionId of this InventoryStock
+          type: string
+      example:
+        inventoryStockId: 1
+        productId: 1
+        size: A string
+        width: A string
+        isFlatFooted: value
+        stockQuantity: 1
+        status: value
+        createdAt: value
+        updatedAt: value
+        productOptionId: value
+tags:
+- name: InventoryStock
+  description: InventoryStock resource

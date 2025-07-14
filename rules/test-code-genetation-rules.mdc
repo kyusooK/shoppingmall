@@ -1,0 +1,15 @@
+---
+
+alwaysApply: false
+---
+
+When generating test code for the project, you must create it based on the content and requirements below.
+
+Reference Metadata:
+When writing test code, you must base it on the given, when, then data under the examples data in the Metadata.
+
+Test Code Components:
+1. JUnit and Spring Boot related imports and code must be configured
+2. JPA test settings through the DataJPATest annotation
+3. Kafka configurations are strictly prohibited. If needed, they must be replaced with Mocks
+4. Test code must be generated using the Given-When-Then pattern.

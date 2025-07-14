@@ -1,0 +1,271 @@
+---
+description: Vue 3 + Vite 기반 Frontend 프로젝트의 효율적인 생성 및 개발 순서를 정의합니다. 오류를 최소화하고 단계별로 검증하며 개발할 수 있도록 가이드라인을 제공합니다.
+alwaysApply: false
+---
+Vue3 Frontend 프로젝트를 다음 요구사항에 따라 생성하세요:
+
+## Frontend 프로젝트 생성 전제조건
+BoundedContext별 PRD에 따른 frontend 구성 시, 반드시 다음의 요구사항을 따라야 합니다:
+
+1. Frontend 폴더 생성: 모든 frontend 관련 파일 생성 전에 먼저 `frontend` 폴더를 생성해야 합니다.
+2. BC별 통합 구조: 모든 BoundedContext(order, delivery, product, ui)의 frontend 파일들은 하나의 `frontend` 폴더 하위에 구성되어야 합니다.
+3. 구조 준수: `@frontend-package-structure`에 정의된 통합 frontend 구조를 반드시 따라야 합니다.
+
+## 프로젝트 개발 순서 가이드라인
+
+### 1단계: 프로젝트 초기 설정
+
+#### 1.1 Vite 프로젝트 생성
+```bash
+# frontend 폴더 생성 및 Vite 프로젝트 초기화
+pnpm create vite@latest frontend -- --template vue
+cd frontend
+```
+
+#### 1.2 기본 의존성 설치
+```bash
+# 핵심 패키지 설치
+pnpm add vuetify @mdi/font axios pinia vue-router
+pnpm add -D vite-plugin-vuetify sass
+```
+
+#### 1.3 개발 환경 검증
+```bash
+# 초기 구동 테스트
+pnpm dev
+# 브라우저에서 http://localhost:5173 접속 확인
+```
+
+### 2단계: 프로젝트 기본 구조 구성
+
+#### 2.1 폴더 구조 생성
+- 아래 순서대로 폴더를 생성하여 프로젝트 구조를 만듭니다:
+  1. `src/components/common` - 공통 컴포넌트
+  2. `src/composables/common` - 공통 컴포저블
+  3. `src/stores` - Pinia 스토어
+  4. `src/services` - API 서비스
+  5. `src/views` - 페이지 컴포넌트
+  6. `src/router` - 라우터 설정
+  7. `src/plugins` - Vue 플러그인
+  8. `src/assets/styles` - 스타일 파일
+
+#### 2.2 설정 파일 구성
+1. `vite.config.js` 수정 - Vuetify 플러그인 및 alias 설정
+2. `src/plugins/vuetify.js` 생성 - Vuetify 인스턴스 설정
+3. `src/router/index.js` 생성 - Vue Router 설정
+4. `src/main.js` 수정 - 플러그인 등록
+
+### 3단계: MSA 백엔드 연동 준비
+
+#### 3.1 API 문서 분석
+1. 각 MSA 서비스 폴더의 `api/openapi.yaml` 파일 확인
+2. `Frontend-PRD.txt` 문서 검토
+3. API 엔드포인트 목록 작성
+
+#### 3.2 API 서비스 레이어 구성
+```javascript
+// src/services/api.js
+import axios from 'axios'
+
+const api = axios.create({
+  baseURL: '/api',
+  timeout: 10000
+})
+
+// 인터셉터 설정
+api.interceptors.request.use(/* ... */)
+api.interceptors.response.use(/* ... */)
+
+export default api
+```
+
+### 4단계: BoundedContext별 모듈 개발
+
+#### 4.1 개발 우선순위
+1. **인증/사용자 관리** 모듈 (있는 경우)
+2. **핵심 비즈니스 도메인** 모듈
+3. **보조 기능** 모듈
+4. **관리자** 모듈
+
+#### 4.2 모듈별 개발 순서
+각 BoundedContext에 대해 다음 순서로 개발:
+
+1. **타입 정의** (`types/[context].types.js`)
+   ```javascript
+   // Aggregate 기반 타입 정의
+   export interface Product {
+     id: string
+     name: string
+     price: number
+     // ...
+   }
+   ```
+
+2. **API 서비스** (`services/[context]/[aggregate].service.js`)
+   ```javascript
+   import api from '@/services/api'
+   
+   export const productService = {
+     getAll: () => api.get('/products'),
+     getById: (id) => api.get(`/products/${id}`),
+     create: (data) => api.post('/products', data),
+     // ...
+   }
+   ```
+
+3. **Pinia 스토어** (`stores/[context]/[aggregate].store.js`)
+   ```javascript
+   import { defineStore } from 'pinia'
+   import { productService } from '@/services/product.service'
+   
+   export const useProductStore = defineStore('product', {
+     state: () => ({ /* ... */ }),
+     actions: { /* ... */ }
+   })
+   ```
+
+4. **컴포넌트 개발** (다음 순서로)
+   - List 컴포넌트 (`components/[context]/[Aggregate]List.vue`)
+   - Form 컴포넌트 (`components/[context]/[Aggregate]Form.vue`)
+   - Detail 컴포넌트 (`components/[context]/[Aggregate]Detail.vue`)
+   - Command 버튼들 (`components/[context]/[Command]Button.vue`)
+
+5. **View 페이지** (`views/[context]/[Aggregate]View.vue`)
+
+6. **라우터 등록** (`router/[context].routes.js`)
+
+### 5단계: UI 통합 및 테스트
+
+#### 5.1 메인 레이아웃 구성
+1. `App.vue`에 `<v-app>` 컴포넌트 적용
+2. 네비게이션 구조 구성
+3. 메인 대시보드 페이지 생성
+
+#### 5.2 MCP Playwright를 활용한 UI 테스트
+```bash
+# MCP Playwright로 테스트 세션 시작
+# 각 CRUD 기능 테스트
+# 네비게이션 흐름 테스트
+```
+
+### 6단계: 최종 검증 및 배포 준비
+
+#### 6.1 빌드 및 검증
+```bash
+# 린트 실행
+pnpm run lint
+
+# 프로덕션 빌드
+pnpm run build
+
+# 빌드 결과 미리보기
+pnpm run preview
+```
+
+#### 6.2 성능 최적화
+1. 번들 크기 분석
+2. 지연 로딩 적용
+3. 이미지 최적화
+
+## 중요 체크포인트
+
+### 각 단계별 검증 사항
+- **1단계 후**: 개발 서버가 정상 구동되는가?
+- **2단계 후**: Vuetify 컴포넌트가 정상 렌더링되는가?
+- **3단계 후**: API 호출이 정상적으로 프록시되는가?
+- **4단계 후**: 각 모듈의 CRUD가 정상 작동하는가?
+- **5단계 후**: 전체 네비게이션 흐름이 원활한가?
+- **6단계 후**: 프로덕션 빌드가 오류 없이 완료되는가?
+
+### 일반적인 오류 대처 방법
+
+1. **Vite 관련 오류**
+   - 캐시 삭제: `rm -rf node_modules/.vite`
+   - 의존성 재설치: `pnpm install`
+
+2. **Vuetify 스타일 누락**
+   - `vuetify/styles` import 확인
+   - `vite-plugin-vuetify` 설정 확인
+
+3. **API CORS 오류**
+   - `vite.config.js`의 proxy 설정 확인
+   - 백엔드 CORS 설정 확인 
+
+## 파일 생성 세부 가이드라인
+한 번에 모든 것을 요청하지 말고, 아래 요구사항에 따라 순차적으로 코드를 생성해 주세요:
+
+1. 프로젝트 설정 섹션
+    - package.json 선언
+    - 필요한 모든 의존성 및 devDependencies
+
+2. 설정 파일 섹션
+    - Vue 프로젝트 필수 설정 파일들
+    - TypeScript, ESLint, Prettier 설정
+
+3. 컴포넌트 및 로직 섹션
+    - 각 파일의 역할에 따른 컴포넌트 선언 또는 Composable 선언
+
+필수 응답 규칙:
+모든 파일은 오류를 수정하기 전에 요구사항에 따라 생성되어야 합니다. 파일 생성 중 오류 수정에 빠져 무한 루프에 빠지지 마세요.
+
+## Frontend-PRD 문서 작성 가이드라인
+
+Frontend 개발 시작 전, 각 BoundedContext별로 Frontend-PRD.txt 문서를 작성하거나 업데이트해야 합니다:
+
+### Frontend-PRD.txt 구조
+```markdown
+# [BoundedContext명] Frontend PRD
+
+## 1. 서비스 개요
+- 서비스 목적 및 주요 기능
+- 타겟 사용자
+- 핵심 가치 제안
+
+## 2. UI/UX 요구사항
+### 2.1 주요 화면 구성
+- 화면별 목적과 기능
+- 네비게이션 흐름
+- 사용자 시나리오
+
+### 2.2 Aggregate별 UI 구성
+#### [Aggregate명]
+- List View: 목록 표시 방식, 정렬/필터 옵션
+- Detail View: 상세 정보 표시 항목
+- Form View: 입력 필드 및 검증 규칙
+- Actions: 가능한 사용자 액션 (CRUD + 커스텀)
+
+## 3. API 연동 명세
+- 백엔드 API 엔드포인트
+- 요청/응답 데이터 구조
+- 에러 처리 방안
+
+## 4. 비즈니스 로직
+- 프론트엔드에서 처리할 검증 로직
+- 상태 관리 요구사항
+- 실시간 업데이트 필요 여부
+
+## 5. 성능 및 보안 요구사항
+- 페이지 로딩 시간 목표
+- 데이터 캐싱 전략
+- 보안 고려사항
+```
+
+### PRD 기반 개발 프로세스
+1. 기존 Frontend-PRD.txt 파일 확인
+2. 없으면 위 구조에 따라 신규 작성
+3. 백엔드 API 문서와 대조하여 일관성 확인
+4. UI 컴포넌트 개발 시 PRD 요구사항 반영
+
+프로젝트 생성 요구사항
+1. 프로젝트 생성 시 Root 디렉토리의 기존 파일들을 참조하지 마세요. 파일들은 메타데이터에 정의된 폴더 구조를 기반으로만 생성되어야 합니다.
+3. 패키지 구조는 반드시 `@package-structure.mdc`를 기반으로 생성되어야 합니다.
+4. 프로젝트 구성을 위한 기술 요구사항, 프레임워크 및 아키텍처는 반드시 `@technical-stack`를 기반으로 생성되어야 합니다.
+5. 모든 파일은 반드시 메타데이터를 기반으로 생성되어야 하며, 메타데이터에 포함되지 않은 데이터를 기반으로 생성되어서는 안 됩니다.
+6. 파일 생성 시 `@frontend-eventstorming-sticker-based-rules`의 요구사항을 따라야 합니다.
+7. 모든 파일 생성이 완료된 후, 구성된 파일에 발생하는 오류를 수정한 후, node_module 설치 및 실행을 진행해야합니다.
+
+## BC별 Frontend 통합 구성 원칙
+- 단일 Frontend 프로젝트: 모든 BC가 하나의 frontend 프로젝트로 통합 관리됩니다.
+- BC별 모듈화: 각 BC의 컴포넌트, 서비스, 스토어는 BC별 폴더에서 격리 관리됩니다.
+- 공통 자원 공유: 공통 컴포넌트, 유틸리티, 스타일은 common 폴더에서 공유됩니다.
+- 독립적 라우팅: 각 BC는 독립적인 라우트를 가지되, 메인 라우터에서 통합됩니다.Vue3 Frontend 프로젝트를 다음 요구사항에 따라 생성하세요:

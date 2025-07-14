@@ -1,0 +1,106 @@
+---
+description: Vue 3 + Vite 프로젝트의 표준 폴더 구조를 정의합니다. 확장 가능하고 유지보수가 용이한 프로젝트 구조를 제공합니다.
+alwaysApply: false
+---
+Vue3 Frontend 프로젝트 구조 요구사항
+
+제공된 메타데이터에 따라 다음 구조와 파일 설명을 따라 파일들을 생성해 주세요.
+BoundedContext별 PRD에 따른 frontend는 하나의 frontend 폴더 하위에 통합 구성됩니다.
+
+```
+/frontend                  # 통합 프론트엔드 프로젝트
+  /src
+    /components
+      /common              # 모든 BC에서 공통으로 사용하는 컴포넌트
+        /Button.vue        # 재사용 가능한 버튼 컴포넌트
+        /Modal.vue         # 모달 컴포넌트
+        /DataTable.vue     # 데이터 테이블 컴포넌트
+        /Layout.vue        # 공통 레이아웃 컴포넌트
+      /[BoundedContext]    # BC별 컴포넌트 그룹 (author, platform, point, subscriber 등)
+        /[aggregate]       # BC 내 Aggregate별 컴포넌트
+          /AggregateList.vue # Aggregate 데이터를 표시하는 List 컴포넌트
+          /AggregateDetail.vue # Aggregate 상세 정보 컴포넌트
+          /AggregateForm.vue # Aggregate 생성/수정 폼 컴포넌트
+        /[command]         # BC 내 Command별 버튼 컴포넌트
+          /CommandButton.vue # Command 실행을 위한 버튼 컴포넌트
+    /composables
+      /common              # 공통 composables
+        /useAuth.ts        # 인증 관련 로직
+        /useNotification.ts # 알림 관련 로직
+      /[BoundedContext]    # BC별 composables
+        /use[Aggregate].ts # BC 내 Aggregate 관련 비즈니스 로직
+        /use[Command].ts   # BC 내 Command 관련 API 호출 로직
+        /use[Event].ts     # BC 내 Event 처리 로직
+        /usePolicyHandler.ts # BC 내 Policy 이벤트 핸들링 로직
+    /stores
+      /common
+        /app.store.ts      # 애플리케이션 전역 상태
+        /auth.store.ts     # 인증 상태 관리
+      /[BoundedContext]    # BC별 스토어
+        /[aggregate].store.ts # BC 내 Aggregate 상태 관리
+    /services
+      /api
+        /client.ts         # API 클라이언트 기본 설정
+        /interceptors.ts   # API 인터셉터
+      /[BoundedContext]    # BC별 API 서비스
+        /[aggregate].service.ts # BC 내 Aggregate 관련 API 서비스
+    /types
+      /common.types.ts     # 공통 타입 정의
+      /[BoundedContext]    # BC별 타입 정의
+        /[aggregate].types.ts # BC 내 Aggregate 관련 TypeScript 타입 정의
+    /views
+      /common
+        /MainDashboard.vue # 메인 대시보드 페이지
+        /NotFound.vue      # 404 페이지
+      /[BoundedContext]    # BC별 페이지 그룹
+        /[Aggregate]View.vue # BC 내 Aggregate 메인 뷰
+        /[Aggregate]ListView.vue # BC 내 Aggregate 목록 뷰
+        /[Aggregate]DetailView.vue # BC 내 Aggregate 상세 뷰
+    /router
+      /index.ts            # Vue Router 메인 설정
+      /[BoundedContext].routes.ts # BC별 라우트 정의
+    /assets
+      /styles
+        /main.scss         # 전역 스타일
+        /variables.scss    # SCSS 변수
+        /themes            # 테마별 스타일
+      /images              # 이미지 리소스
+        /common            # 공통 이미지
+        /[BoundedContext]  # BC별 이미지
+    /plugins
+      /vuetify.ts          # Vuetify 플러그인 설정 (또는 Element Plus)
+      /pinia.ts            # Pinia 플러그인 설정
+    /utils
+      /helpers.ts          # 유틸리티 함수
+      /constants.ts        # 상수 정의
+      /formatters.ts       # 데이터 포맷터
+    App.vue                # 루트 컴포넌트
+    main.ts                # 애플리케이션 진입점
+  /tests
+    /unit
+      /components          # 컴포넌트 단위 테스트
+        /common            # 공통 컴포넌트 테스트
+        /[BoundedContext]  # BC별 컴포넌트 테스트
+      /composables         # Composables 단위 테스트
+      /stores              # 스토어 단위 테스트
+      /utils               # 유틸리티 함수 테스트
+    /integration          # 통합 테스트
+    /e2e                  # E2E 테스트
+    vitest.config.ts      # Vitest 설정
+    playwright.config.ts  # Playwright E2E 테스트 설정
+  /public
+    index.html            # HTML 진입점
+    favicon.ico           # 파비콘
+    /assets               # 정적 자산
+  /docs                   # 프로젝트 문서
+    /components          # 컴포넌트 문서
+    /api                 # API 문서
+  package.json            # NPM 패키지 설정
+  vite.config.ts          # Vite 빌드 도구 설정
+  tsconfig.json           # TypeScript 설정
+  .eslintrc.js            # ESLint 설정
+  .prettierrc             # Prettier 설정
+  .env                    # 환경 변수
+  .env.example            # 환경 변수 예시
+  ```
+

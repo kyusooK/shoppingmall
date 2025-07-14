@@ -1,0 +1,779 @@
+
+openapi: 3.1.0
+info:
+  title: shoppingmall API
+  version: 0.0.1
+  description: API definition of shoppingmall
+  contact:
+    name: creator's name
+    url: http://creator.homepage.address
+    email: creator@creator.com
+  license:
+    name: MIT License
+    url: https://opensource.org/licenses/MIT
+paths:
+  /cartItems:
+    summary: Global operations on cartItems
+    get:
+      tags:
+      - cartItems
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CartItem'
+              examples:
+                value:
+          description: Get list of cartItems
+      operationId: GetCartItem
+      summary: Get list of cartItems
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CartItem'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartItem'
+          description: Changed CartItem
+      operationId: Post CartItem
+      summary: Post CartItem        
+  /cartItems/{id}:
+    summary: Specific operation on cartItems
+    get:
+      parameters:
+      - examples:
+          Long:
+            value: Long
+        name: id
+        description: CartItem name
+        schema:
+          type: Long
+        in: path
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartItem'
+              examples:
+                value:
+                    cartItemId: 1
+                    userId: 1
+                    size: A string
+                    width: A string
+                    isFlatFooted: value
+                    quantity: 1
+                    status: value
+                    createdAt: value
+                    updatedAt: value
+                    productId: value
+                    inventoryStockId: value
+          description: cartItems with specified id
+      operationId: GetCartItemById
+      summary: Get CartItem by id
+      description: Get CartItem by id
+    patch:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CartItem'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartItem'
+          description: Changed CartItem
+      operationId: PatchCartItem
+      summary: Patch existing CartItem
+    parameters:
+    - name: id
+      description: CartItem id
+      schema:
+        type: integer
+      in: path
+      required: true
+  /cartItems/{id}selectproductoption:
+    summary: SelectProductOption operation on cartItems
+    POST:
+      requestBody:
+        content:
+          application/json:
+            schema:      # Request body contents
+              type: object
+              properties:
+                userId:
+                  description: userId of this SelectProductOption
+                  type: integer
+                productId:
+                  description: productId of this SelectProductOption
+                  type: string
+                size:
+                  description: size of this SelectProductOption
+                  type: string
+                width:
+                  description: width of this SelectProductOption
+                  type: string
+                isFlatFooted:
+                  description: isFlatFooted of this SelectProductOption
+                  type: string
+            examples:
+              Example 0:   
+                value:
+                  isFlatFooted: true
+                  productId: [object Object]
+                  size: 265
+                  userId: 2001
+                  width: E
+              Example 1:   
+                value:
+                  isFlatFooted: false
+                  productId: [object Object]
+                  size: 
+                  userId: 2002
+                  width: D
+      parameters:
+      - name: id
+        description: SelectProductOption name
+        schema:
+          type: integer
+        in: path
+        required: true
+        examples:
+          Example 0:   
+            value:
+              isFlatFooted: true
+              productId: [object Object]
+              size: 265
+              userId: 2001
+              width: E
+          Example 1:   
+            value:
+              isFlatFooted: false
+              productId: [object Object]
+              size: 
+              userId: 2002
+              width: D
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartItem'
+              examples:
+                Example 0: 
+                  value:
+                    isFlatFooted: true
+                    optionSelectedAt: 2024-06-01T10:05:00Z
+                    productId: [object Object]
+                    size: 265
+                    userId: 2001
+                    width: E
+                Example 1: 
+                  value:
+                    cartItemIds: [object Object]
+                    errorMessage: 필수 옵션(사이즈)이 선택되지 않았습니다.
+                    userId: 2002
+          description: SelectProductOption Operation
+      operationId: SelectProductOption
+      summary: SelectProductOption
+      description: SelectProductOption
+  /cartItems/{id}addcartitem:
+    summary: AddCartItem operation on cartItems
+    POST:
+      requestBody:
+        content:
+          application/json:
+            schema:      # Request body contents
+              type: object
+              properties:
+                userId:
+                  description: userId of this AddCartItem
+                  type: integer
+                productId:
+                  description: productId of this AddCartItem
+                  type: string
+                size:
+                  description: size of this AddCartItem
+                  type: string
+                width:
+                  description: width of this AddCartItem
+                  type: string
+                isFlatFooted:
+                  description: isFlatFooted of this AddCartItem
+                  type: string
+                quantity:
+                  description: quantity of this AddCartItem
+                  type: integer
+                inventoryStockId:
+                  description: inventoryStockId of this AddCartItem
+                  type: string
+            examples:
+              Example 0:   
+                value:
+                  inventoryStockId: [object Object]
+                  isFlatFooted: false
+                  productId: [object Object]
+                  quantity: 2
+                  size: 255
+                  userId: 2003
+                  width: E
+              Example 1:   
+                value:
+                  inventoryStockId: [object Object]
+                  isFlatFooted: true
+                  productId: [object Object]
+                  quantity: 0
+                  size: 250
+                  userId: 2004
+                  width: D
+      parameters:
+      - name: id
+        description: AddCartItem name
+        schema:
+          type: integer
+        in: path
+        required: true
+        examples:
+          Example 0:   
+            value:
+              inventoryStockId: [object Object]
+              isFlatFooted: false
+              productId: [object Object]
+              quantity: 2
+              size: 255
+              userId: 2003
+              width: E
+          Example 1:   
+            value:
+              inventoryStockId: [object Object]
+              isFlatFooted: true
+              productId: [object Object]
+              quantity: 0
+              size: 250
+              userId: 2004
+              width: D
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartItem'
+              examples:
+                Example 0: 
+                  value:
+                    addedAt: 2024-06-01T10:10:00Z
+                    cartItemId: 1003
+                    inventoryStockId: [object Object]
+                    isFlatFooted: false
+                    productId: [object Object]
+                    quantity: 2
+                    size: 255
+                    userId: 2003
+                    width: E
+                Example 1: 
+                  value:
+                    cartItemIds: [object Object]
+                    errorMessage: 수량이 1개 이상이어야 합니다.
+                    userId: 2004
+          description: AddCartItem Operation
+      operationId: AddCartItem
+      summary: AddCartItem
+      description: AddCartItem
+  /orders:
+    summary: Global operations on orders
+    get:
+      tags:
+      - orders
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+              examples:
+                value:
+          description: Get list of orders
+      operationId: GetOrder
+      summary: Get list of orders
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Order'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+          description: Changed Order
+      operationId: Post Order
+      summary: Post Order        
+  /orders/{id}:
+    summary: Specific operation on orders
+    get:
+      parameters:
+      - examples:
+          Long:
+            value: Long
+        name: id
+        description: Order name
+        schema:
+          type: Long
+        in: path
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+              examples:
+                value:
+                    orderId: 1
+                    userId: 1
+                    items: value
+                    status: value
+                    paymentStatus: value
+                    orderHistory: value
+                    createdAt: value
+                    updatedAt: value
+                    cartItemId: value
+          description: orders with specified id
+      operationId: GetOrderById
+      summary: Get Order by id
+      description: Get Order by id
+    patch:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Order'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+          description: Changed Order
+      operationId: PatchOrder
+      summary: Patch existing Order
+    parameters:
+    - name: id
+      description: Order id
+      schema:
+        type: integer
+      in: path
+      required: true
+  /orders/{id}requestorderpayment:
+    summary: RequestOrderPayment operation on orders
+    POST:
+      requestBody:
+        content:
+          application/json:
+            schema:      # Request body contents
+              type: object
+              properties:
+                orderId:
+                  description: orderId of this RequestOrderPayment
+                  type: integer
+            examples:
+              Example 0:   
+                value:
+                  orderId: 1002
+      parameters:
+      - name: id
+        description: RequestOrderPayment name
+        schema:
+          type: integer
+        in: path
+        required: true
+        examples:
+          Example 0:   
+            value:
+              orderId: 1002
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+              examples:
+                Example 0: 
+                  value:
+                    items: [object Object]
+                    orderId: 1002
+                    paymentStatus: REQUESTED
+                    totalAmount: 99000
+                    userId: 2001
+          description: RequestOrderPayment Operation
+      operationId: RequestOrderPayment
+      summary: RequestOrderPayment
+      description: RequestOrderPayment
+  /orders/{id}placeorder:
+    summary: PlaceOrder operation on orders
+    POST:
+      requestBody:
+        content:
+          application/json:
+            schema:      # Request body contents
+              type: object
+              properties:
+                userId:
+                  description: userId of this PlaceOrder
+                  type: integer
+                cartItemIds:
+                  description: cartItemIds of this PlaceOrder
+                  type: string
+            examples:
+              Example 0:   
+                value:
+                  cartItemIds: [object Object]
+                  userId: 2001
+              Example 1:   
+                value:
+                  cartItemIds: [object Object]
+                  userId: 2002
+      parameters:
+      - name: id
+        description: PlaceOrder name
+        schema:
+          type: integer
+        in: path
+        required: true
+        examples:
+          Example 0:   
+            value:
+              cartItemIds: [object Object]
+              userId: 2001
+          Example 1:   
+            value:
+              cartItemIds: [object Object]
+              userId: 2002
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+              examples:
+                Example 0: 
+                  value:
+                    createdAt: 2024-06-01T10:01:00Z
+                    items: [object Object]
+                    orderId: 1002
+                    status: PLACED
+                    userId: 2001
+                Example 1: 
+                  value:
+                    cartItemIds: [object Object]
+                    errorMessage: 필수 옵션(사이즈 등)이 선택되지 않았습니다.
+                    userId: 2002
+          description: PlaceOrder Operation
+      operationId: PlaceOrder
+      summary: PlaceOrder
+      description: PlaceOrder
+  /orders/{id}updateorderhistory:
+    summary: UpdateOrderHistory operation on orders
+    POST:
+      requestBody:
+        content:
+          application/json:
+            schema:      # Request body contents
+              type: object
+              properties:
+                orderId:
+                  description: orderId of this UpdateOrderHistory
+                  type: integer
+                status:
+                  description: status of this UpdateOrderHistory
+                  type: string
+            examples:
+              Example 0:   
+                value:
+                  orderId: 1002
+                  status: DELIVERED
+      parameters:
+      - name: id
+        description: UpdateOrderHistory name
+        schema:
+          type: integer
+        in: path
+        required: true
+        examples:
+          Example 0:   
+            value:
+              orderId: 1002
+              status: DELIVERED
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+              examples:
+                Example 0: 
+                  value:
+                    orderId: 1002
+                    status: DELIVERED
+                    updatedAt: 2024-06-01T10:07:00Z
+          description: UpdateOrderHistory Operation
+      operationId: UpdateOrderHistory
+      summary: UpdateOrderHistory
+      description: UpdateOrderHistory
+  /orders/{id}displayorderhistory:
+    summary: DisplayOrderHistory operation on orders
+    POST:
+      requestBody:
+        content:
+          application/json:
+            schema:      # Request body contents
+              type: object
+              properties:
+                orderId:
+                  description: orderId of this DisplayOrderHistory
+                  type: integer
+            examples:
+              Example 0:   
+                value:
+                  orderId: 1002
+      parameters:
+      - name: id
+        description: DisplayOrderHistory name
+        schema:
+          type: integer
+        in: path
+        required: true
+        examples:
+          Example 0:   
+            value:
+              orderId: 1002
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+              examples:
+                Example 0: 
+                  value:
+                    displayedAt: 2024-06-01T10:08:00Z
+                    items: [object Object]
+                    orderId: 1002
+                    status: DELIVERED
+                    userId: 2001
+          description: DisplayOrderHistory Operation
+      operationId: DisplayOrderHistory
+      summary: DisplayOrderHistory
+      description: DisplayOrderHistory
+  /orders/{id}rollbackorder:
+    summary: RollbackOrder operation on orders
+    POST:
+      requestBody:
+        content:
+          application/json:
+            schema:      # Request body contents
+              type: object
+              properties:
+                orderId:
+                  description: orderId of this RollbackOrder
+                  type: integer
+                rollbackReason:
+                  description: rollbackReason of this RollbackOrder
+                  type: string
+            examples:
+              Example 0:   
+                value:
+                  orderId: 1002
+                  rollbackReason: 결제 실패로 인한 롤백
+      parameters:
+      - name: id
+        description: RollbackOrder name
+        schema:
+          type: integer
+        in: path
+        required: true
+        examples:
+          Example 0:   
+            value:
+              orderId: 1002
+              rollbackReason: 결제 실패로 인한 롤백
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+              examples:
+                Example 0: 
+                  value:
+                    orderId: 1002
+                    rollbackReason: 결제 실패로 인한 롤백
+                    rolledBackAt: 2024-06-01T10:03:00Z
+          description: RollbackOrder Operation
+      operationId: RollbackOrder
+      summary: RollbackOrder
+      description: RollbackOrder
+  /orders/{id}readyorderforshipment:
+    summary: ReadyOrderForShipment operation on orders
+    POST:
+      requestBody:
+        content:
+          application/json:
+            schema:      # Request body contents
+              type: object
+              properties:
+                orderId:
+                  description: orderId of this ReadyOrderForShipment
+                  type: integer
+            examples:
+              Example 0:   
+                value:
+                  orderId: 1002
+      parameters:
+      - name: id
+        description: ReadyOrderForShipment name
+        schema:
+          type: integer
+        in: path
+        required: true
+        examples:
+          Example 0:   
+            value:
+              orderId: 1002
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+              examples:
+                Example 0: 
+                  value:
+                    items: [object Object]
+                    orderId: 1002
+                    readyForShipmentAt: 2024-06-01T10:05:00Z
+          description: ReadyOrderForShipment Operation
+      operationId: ReadyOrderForShipment
+      summary: ReadyOrderForShipment
+      description: ReadyOrderForShipment
+components:
+  schemas:
+    CartItem:
+      title: Root Type for CartItem
+      description: The root of the CartItem type's schema.
+      type: object
+      properties:
+        cartItemId:
+          description: cartItemId of this CartItem
+          type: integer
+        userId:
+          description: userId of this CartItem
+          type: integer
+        size:
+          description: size of this CartItem
+          type: string
+        width:
+          description: width of this CartItem
+          type: string
+        isFlatFooted:
+          description: isFlatFooted of this CartItem
+          type: string
+        quantity:
+          description: quantity of this CartItem
+          type: integer
+        status:
+          description: status of this CartItem
+          type: string
+        createdAt:
+          description: createdAt of this CartItem
+          type: string
+        updatedAt:
+          description: updatedAt of this CartItem
+          type: string
+        productId:
+          description: productId of this CartItem
+          type: string
+        inventoryStockId:
+          description: inventoryStockId of this CartItem
+          type: string
+      example:
+        cartItemId: 1
+        userId: 1
+        size: A string
+        width: A string
+        isFlatFooted: value
+        quantity: 1
+        status: value
+        createdAt: value
+        updatedAt: value
+        productId: value
+        inventoryStockId: value
+tags:
+- name: CartItem
+  description: CartItem resource
+components:
+  schemas:
+    Order:
+      title: Root Type for Order
+      description: The root of the Order type's schema.
+      type: object
+      properties:
+        orderId:
+          description: orderId of this Order
+          type: integer
+        userId:
+          description: userId of this Order
+          type: integer
+        items:
+          description: items of this Order
+          type: string
+        status:
+          description: status of this Order
+          type: string
+        paymentStatus:
+          description: paymentStatus of this Order
+          type: string
+        orderHistory:
+          description: orderHistory of this Order
+          type: string
+        createdAt:
+          description: createdAt of this Order
+          type: string
+        updatedAt:
+          description: updatedAt of this Order
+          type: string
+        cartItemId:
+          description: cartItemId of this Order
+          type: string
+      example:
+        orderId: 1
+        userId: 1
+        items: value
+        status: value
+        paymentStatus: value
+        orderHistory: value
+        createdAt: value
+        updatedAt: value
+        cartItemId: value
+tags:
+- name: Order
+  description: Order resource

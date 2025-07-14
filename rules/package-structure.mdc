@@ -1,0 +1,32 @@
+---
+
+alwaysApply: false
+---
+
+Package Structure Requirements for Code Generation
+
+Please generate the following files according to the provided metadata, following the structure and file descriptions below.
+
+```
+/[service] # Created by metadata name.
+  /src
+    /main
+      /java/shoppingmall
+        /domain
+            /Aggregate.java  # Domain entity implementing DDD Aggregate Root
+            /ValueObject.java # VO class forming relationship with Aggregate Root Entity
+            /Entity.java # Entity class forming relationship with Aggregate Root Entity
+            /Enum.java # Enum class forming relationship with Aggregate Root Entity
+            /Event.java # Event Publish class for the results of domain state changes in the Aggregate Root
+            /Command.java # Request body based on Extended API of Command attached to Aggregate (Only generated when isRestRepository of commands in metadata is false.)
+            /AggregateRepository.java # JPA Repository 
+        /infra
+            Controller.java(if metadata`s commands exists) # Inbound Adaptor providing RESTful API endpoints,
+            PolicyHandler.java # Inbound Adaptor for receiving and processing events (If metadata`s policies exists.)
+            EventHandler.java # An outbound adapter that publishes domain events stored in the event queue (List) inside AbstractAggregateRoot to the outside.
+      /resources
+        application.yml # Defines service configuration in microservice environment
+    /test
+      [service]Test.java # JUnit Test file structure based on Given-When-Then pattern(If metadata`s policies.examples)
+  pom.xml              # Maven configuration based on Spring Boot 3
+  ```

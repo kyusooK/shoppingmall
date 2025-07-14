@@ -1,0 +1,497 @@
+---
+description: EventStorming 스티커 기반으로 UI 컴포넌트를 생성하는 규칙을 정의합니다. MSA 백엔드와의 연동과 Vuetify UI 프레임워크 활용 방안을 포함합니다.
+alwaysApply: false
+---
+UI에 대한 흐름 및 요구사항은 `@frontend-ui-requirments`를 참고해야합니다.
+
+## Command
+0. 필수 참고사항
+반드시 api/openapi.yaml 또는 각 service 폴더 내에 openapi.yaml 파일을 참고하여 axios호출로 진행 및 버튼 구성을 해야합니다.
+
+
+1. 참조 메타데이터
+Command는 'commands' 메타데이터를 사용하며, UI에서 버튼 형태로 구현됩니다. 각 Command는 사용자 액션을 트리거하는 버튼 컴포넌트로 생성됩니다.
+
+2. 생성되는 파일
+CommandButton.vue
+파일명: Command 스티커 이름 + Button.vue
+구조:
+- 버튼 UI 컴포넌트
+- 클릭 이벤트 핸들러
+- API 호출 로직 (Composables 활용)
+- 로딩 상태 및 에러 처리
+- 버튼 스타일링 (Vuetify/Element Plus 기반)
+
+CommandComposable.ts
+파일명: Command 스티커 이름 + Command.composable.ts
+구조:
+- API 호출 함수
+- 상태 관리 (로딩, 에러, 성공)
+- 폼 데이터 유효성 검사 (VeeValidate 활용)
+
+3. 버튼 생성 규칙
+백엔드 REST API에 맞춰 Vuetify 버튼 컴포넌트로 구현합니다.
+
+**Vuetify 버튼 컴포넌트 활용:**
+```vue
+<template>
+  <v-btn 
+    :color="buttonConfig.color"
+    :variant="buttonConfig.variant"
+    :loading="loading"
+    :disabled="disabled"
+    @click="handleCommand"
+  >
+    <v-icon start>{{ buttonConfig.icon }}</v-icon>
+    {{ buttonConfig.label }}
+  </v-btn>
+</template>
+
+<script setup>
+import { computed } from 'vue'
+import { useCommandComposable } from '@/composables/[context]/[command].composable'
+
+const props = defineProps({
+  aggregateId: String,
+  commandData: Object
+})
+
+const { execute, loading, error } = useCommandComposable()
+
+const buttonConfig = computed(() => ({
+  create: { color: 'primary', icon: 'mdi-plus', label: '생성', variant: 'elevated' },
+  update: { color: 'info', icon: 'mdi-pencil', label: '수정', variant: 'tonal' },
+  delete: { color: 'error', icon: 'mdi-delete', label: '삭제', variant: 'outlined' }
+}[props.commandType] || {}))
+</script>
+```
+
+버튼 생성 로직:
+```typescript
+// 기본 CUD 버튼은 항상 생성
+const defaultButtons = ['Create', 'Update', 'Delete'];
+
+// Command 메타데이터 확인
+commands.forEach(command => {
+  if (command.isRestRepository !== true) {
+    // controllerInfo를 활용한 커스텀 버튼 생성
+    const customButton = {
+      name: command.name,
+      endpoint: `/${aggregate.namePlural}/${command.controllerInfo.apiPath}`,
+      method: command.controllerInfo.method,
+      description: command.description
+    };
+    // 커스텀 버튼 컴포넌트 생성
+  }
+});
+```
+
+생성되는 버튼 컴포넌트 구조:
+- 기본 CUD 버튼: 표준 REST API 엔드포인트 사용 (/{aggregate.namePlural})
+- 커스텀 버튼: aggregate.namePlural과 controllerInfo.apiPath를 조합한 엔드포인트 사용 (/{aggregate.namePlural}/{controllerInfo.apiPath})
+- 각 버튼별 독립적인 로딩 상태 및 에러 처리
+- 버튼 활성화/비활성화 조건 설정
+
+4. Create/Update 버튼 다이얼로그 처리
+Create(C)와 Update(U) 버튼 클릭 시 다이얼로그 모달 생성:
+
+다이얼로그 내부 필드 구성 규칙:
+- 기본 CU 버튼의 경우: Aggregate의 속성값들(fieldDescriptors)을 다이얼로그 내부 field로 구성
+- isRestRepository가 true가 아닌 Command의 경우: Command 내부 fieldDescriptors에 정의된 속성을 다이얼로그 내부 field로 구성
+
+다이얼로그 생성 로직:
+```typescript
+// Create/Update 버튼 클릭 시 다이얼로그 생성
+const openDialog = (buttonType: 'create' | 'update', command?: Command) => {
+  let dialogFields = [];
+  
+  if (command && command.isRestRepository !== true) {
+    // Command의 fieldDescriptors 사용
+    dialogFields = command.fieldDescriptors || [];
+  } else {
+    // Aggregate의 fieldDescriptors 사용 (기본 CU)
+    dialogFields = aggregate.fieldDescriptors || [];
+  }
+  
+  // 다이얼로그 모달 생성 및 필드 렌더링
+  createFormDialog({
+    title: buttonType === 'create' ? `Create ${aggregate.name}` : `Update ${aggregate.name}`,
+    fields: dialogFields,
+    onSubmit: (formData) => handleSubmit(buttonType, formData, command)
+  });
+};
+```
+
+다이얼로그 컴포넌트 구조:
+- Modal/Dialog 컴포넌트 (Vuetify/Element Plus 기반)
+- 동적 폼 필드 생성 (fieldDescriptors 기반)
+- VeeValidate를 활용한 폼 유효성 검사
+- 제출/취소 버튼
+- 로딩 상태 및 에러 메시지 표시
+
+
+## Aggregate
+
+1. 참조 메타데이터
+Aggregate는 'aggregates' 메타데이터를 기반으로 List 형태의 컴포넌트로 생성됩니다. fieldDescriptors를 활용하여 속성들을 표시하며, 관계형 데이터 (Enumeration, ValueObject, Entity)를 테이블이나 카드 형태로 구성합니다.
+
+2. 생성되는 파일
+AggregateList.vue
+파일명: Aggregate이름 + List.vue
+구조:
+- 데이터 테이블/카드 리스트 컴포넌트
+- fieldDescriptors 기반 컬럼/필드 구성
+- 검색, 필터링, 정렬 기능
+- 페이지네이션
+- CRUD 액션 버튼들
+- 상세보기 모달/라우터 연동
+
+AggregateStore.ts
+파일명: Aggregate이름 + Store.ts
+구조:
+- Pinia 스토어 정의
+- Aggregate 데이터 상태 관리
+- API 호출 액션들
+- 게터 함수들
+
+## BoundedContext 및 메인페이지 구성
+
+1. 메인페이지 구성 - Vuetify 컴포넌트 활용
+
+**MainDashboard.vue - Vuetify Grid 및 Card 활용**
+```vue
+<template>
+  <v-container fluid>
+    <!-- 헤더 영역 -->
+    <v-row>
+      <v-col>
+        <h1 class="text-h3 mb-4">{{ systemName }} 대시보드</h1>
+      </v-col>
+    </v-row>
+    
+    <!-- 통계 카드 -->
+    <v-row>
+      <v-col v-for="stat in statistics" :key="stat.title" cols="12" sm="6" md="3">
+        <v-card>
+          <v-card-text>
+            <div class="d-flex align-center">
+              <v-icon :color="stat.color" size="48" class="mr-4">
+                {{ stat.icon }}
+              </v-icon>
+              <div>
+                <p class="text-caption mb-1">{{ stat.title }}</p>
+                <p class="text-h5 font-weight-bold">{{ stat.value }}</p>
+              </div>
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+    
+    <!-- BoundedContext 카드 -->
+    <v-row class="mt-4">
+      <v-col>
+        <h2 class="text-h4 mb-4">서비스 영역</h2>
+      </v-col>
+    </v-row>
+    
+    <v-row>
+      <v-col 
+        v-for="context in boundedContexts" 
+        :key="context.name"
+        cols="12" 
+        md="6" 
+        lg="4"
+      >
+        <v-card 
+          :to="context.path"
+          hover
+          class="h-100"
+        >
+          <v-card-title>
+            <v-icon :icon="context.icon" class="mr-2"></v-icon>
+            {{ context.displayName }}
+          </v-card-title>
+          
+          <v-card-subtitle>
+            {{ context.aggregates.length }} Aggregates
+          </v-card-subtitle>
+          
+          <v-card-text>
+            <p class="mb-2">{{ context.description }}</p>
+            <v-chip-group>
+              <v-chip 
+                v-for="agg in context.aggregates.slice(0, 3)" 
+                :key="agg.name"
+                size="small"
+                variant="outlined"
+              >
+                {{ agg.displayName }}
+              </v-chip>
+              <v-chip 
+                v-if="context.aggregates.length > 3"
+                size="small"
+                variant="outlined"
+              >
+                +{{ context.aggregates.length - 3 }} more
+              </v-chip>
+            </v-chip-group>
+          </v-card-text>
+          
+          <v-card-actions>
+            <v-btn 
+              variant="text" 
+              color="primary"
+              append-icon="mdi-arrow-right"
+            >
+              이동
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-col>
+    </v-row>
+    
+    <!-- 최근 활동 -->
+    <v-row class="mt-4">
+      <v-col>
+        <h2 class="text-h4 mb-4">최근 활동</h2>
+        <v-card>
+          <v-list lines="two">
+            <v-list-item
+              v-for="activity in recentActivities"
+              :key="activity.id"
+              :subtitle="activity.description"
+            >
+              <template v-slot:prepend>
+                <v-icon :icon="activity.icon" :color="activity.color"></v-icon>
+              </template>
+              <template v-slot:title>
+                {{ activity.title }}
+                <v-chip size="x-small" class="ml-2">{{ activity.context }}</v-chip>
+              </template>
+              <template v-slot:append>
+                <span class="text-caption">{{ formatTime(activity.timestamp) }}</span>
+              </template>
+            </v-list-item>
+          </v-list>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
+</template>
+
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+// 메타데이터 기반 BoundedContext 생성
+const boundedContexts = computed(() => 
+  generateBoundedContextsFromMetadata(metaData.boundedContexts)
+)
+
+// 통계 데이터
+const statistics = ref([
+  { title: '총 주문', value: '1,234', icon: 'mdi-cart', color: 'primary' },
+  { title: '오늘 매출', value: '₩3,456K', icon: 'mdi-currency-usd', color: 'success' },
+  { title: '활성 사용자', value: '567', icon: 'mdi-account-group', color: 'info' },
+  { title: '대기 처리', value: '89', icon: 'mdi-clock-alert', color: 'warning' }
+])
+</script>
+```
+
+BoundedContext 카드 생성 로직:
+```typescript
+// 메타데이터 기반 BoundedContext 카드들 동적 생성
+const generateBoundedContexts = (boundedContextsMetadata) => {
+  return Object.keys(boundedContextsMetadata).map(contextKey => {
+    const contextAggregates = boundedContextsMetadata[contextKey].aggregates || [];
+    return {
+      name: contextKey,
+      path: `/${contextKey.toLowerCase()}`,
+      aggregates: contextAggregates.map(aggregate => ({
+        name: aggregate.name,
+        namePlural: aggregate.namePlural,
+        displayName: aggregate.displayName || aggregate.name
+      }))
+    };
+  });
+};
+
+// 사용 예시
+const boundedContexts = generateBoundedContexts(metaData.boundedContexts);
+
+// 각 BoundedContext 카드 컴포넌트
+const BoundedContextCard = {
+  props: ['contextName', 'contextPath', 'aggregates'],
+  template: `
+    <div class="context-card" @click="navigateToContext">
+      <h3></h3>
+      <p> Aggregates</p>
+      <ul>
+        <li v-for="aggregate in aggregates" :key="aggregate.name">
+          
+        </li>
+      </ul>
+    </div>
+  `,
+  methods: {
+    navigateToContext() {
+      this.$router.push(\`\${this.contextPath}/\${this.aggregates[0]?.namePlural || ''}\`);
+    }
+  }
+};
+```
+
+2. BoundedContext별 서브메뉴
+각 BoundedContext는 독립적인 서브메뉴로 구성되며, 해당 컨텍스트의 Aggregate List 컴포넌트들을 포함합니다.
+
+SubMenu.vue
+구조:
+- Vue Router 기반 네비게이션
+- BoundedContext별 메뉴 그룹핑
+- 아코디언 또는 탭 형태의 메뉴
+- 메인페이지로 돌아가기 버튼
+
+3. 라우팅 구조 - Vue Router 4 활용
+
+**router/index.js - 동적 라우팅 구성**
+```javascript
+import { createRouter, createWebHistory } from 'vue-router'
+import MainDashboard from '@/views/common/MainDashboard.vue'
+
+// 메타데이터 기반 동적 라우트 생성
+const generateRoutes = (boundedContexts) => {
+  const routes = []
+  
+  Object.entries(boundedContexts).forEach(([contextKey, contextData]) => {
+    const contextRoute = {
+      path: `/${contextKey.toLowerCase()}`,
+      component: () => import(`@/layouts/BoundedContextLayout.vue`),
+      meta: { context: contextKey },
+      children: []
+    }
+    
+    // Aggregate별 라우트 생성
+    contextData.aggregates?.forEach(aggregate => {
+      contextRoute.children.push(
+        {
+          path: aggregate.namePlural,
+          name: `${contextKey}-${aggregate.name}-list`,
+          component: () => import(`@/views/${contextKey}/${aggregate.name}ListView.vue`),
+          meta: { aggregate: aggregate.name }
+        },
+        {
+          path: `${aggregate.namePlural}/:id`,
+          name: `${contextKey}-${aggregate.name}-detail`,
+          component: () => import(`@/views/${contextKey}/${aggregate.name}DetailView.vue`),
+          meta: { aggregate: aggregate.name }
+        }
+      )
+    })
+    
+    routes.push(contextRoute)
+  })
+  
+  return routes
+}
+
+const router = createRouter({
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes: [
+    {
+      path: '/',
+      name: 'home',
+      component: MainDashboard
+    },
+    ...generateRoutes(metaData.boundedContexts),
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'not-found',
+      component: () => import('@/views/common/NotFound.vue')
+    }
+  ]
+})
+
+export default router
+```
+
+**App.vue - Vuetify 기본 레이아웃**
+```vue
+<template>
+  <v-app>
+    <v-navigation-drawer
+      v-model="drawer"
+      app
+    >
+      <v-list nav>
+        <v-list-item
+          prepend-icon="mdi-view-dashboard"
+          title="대시보드"
+          to="/"
+        ></v-list-item>
+        
+        <v-list-group
+          v-for="context in boundedContexts"
+          :key="context.name"
+          :value="context.name"
+        >
+          <template v-slot:activator="{ props }">
+            <v-list-item
+              v-bind="props"
+              :prepend-icon="context.icon"
+              :title="context.displayName"
+            ></v-list-item>
+          </template>
+          
+          <v-list-item
+            v-for="agg in context.aggregates"
+            :key="agg.name"
+            :title="agg.displayName"
+            :to="`/${context.name.toLowerCase()}/${agg.namePlural}`"
+          ></v-list-item>
+        </v-list-group>
+      </v-list>
+    </v-navigation-drawer>
+    
+    <v-app-bar app>
+      <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
+      <v-toolbar-title>{{ systemName }}</v-toolbar-title>
+      <v-spacer></v-spacer>
+      
+      <!-- 사용자 메뉴 -->
+      <v-btn icon="mdi-account-circle" size="large"></v-btn>
+    </v-app-bar>
+    
+    <v-main>
+      <router-view />
+    </v-main>
+    
+    <!-- 전역 스낵바 -->
+    <v-snackbar
+      v-model="snackbar.show"
+      :color="snackbar.color"
+      :timeout="snackbar.timeout"
+    >
+      {{ snackbar.text }}
+      <template v-slot:actions>
+        <v-btn
+          variant="text"
+          @click="snackbar.show = false"
+        >
+          닫기
+        </v-btn>
+      </template>
+    </v-snackbar>
+  </v-app>
+</template>
+```
+
+메인페이지 카드 UI 구성:
+- 메타데이터 기반 BoundedContext명 동적 표시 (contextKey 활용)
+- 해당 컨텍스트 내 Aggregate 개수 동적 표시
+- Aggregate 목록 미리보기 (aggregate.displayName 또는 aggregate.name 활용)
+- 클릭 시 첫 번째 Aggregate의 namePlural 기반 List 페이지로 이동
+- PRD 변경 시 자동으로 반영되는 범용적 구조
+- When parameters from views or ReadModels exist, write query statements referencing queryOption

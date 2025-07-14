@@ -1,0 +1,13 @@
+---
+
+alwaysApply: false
+---
+
+The code for Spring Boot DDD Extension must be structured with reference to the requirements below.
+
+1. Aggregate root entities must inherit from `AbstractAggregateRoot` and register domain events using `registerEvent()`.
+2. Domain event classes are simple POJOs, and there are various event types such as orders, payments, etc. (`OrderPlacedEvent`, `PaymentCompletedEvent`, etc.).
+3. Component classes using `@TransactionalEventListener` should have multiple event handler methods, with one method responsible for each type of event.
+4. Each event handler method publishes messages to Kafka, using `KafkaTemplate<String, String>`.
+5. Kafka topic names are either automatically set based on the event class name or explicitly written.
+6. Events must be processed after transaction commits, so use `@TransactionalEventListener(phase = AFTER_COMMIT)`.

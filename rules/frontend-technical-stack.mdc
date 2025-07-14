@@ -1,0 +1,239 @@
+
+---
+description: Vue 3 + Vite + Vuetify 기반의 현대적인 Frontend 기술 스택을 정의합니다. 오류없이 빠르게 개발하고 효율적으로 배포할 수 있도록 최적화된 기술 구성입니다.
+alwaysApply: false
+---
+
+# Vue3 + Vite Frontend 기술 스택
+
+Frontend 코드를 생성할 때는 아래의 최신 기술 스택과 개발 가이드라인을 준수해 주세요.
+
+## 핵심 기술 스택
+
+### 1. 프로젝트 초기화 및 빌드 도구
+- **Vite 5.x**: 초고속 HMR(Hot Module Replacement)을 지원하는 차세대 빌드 도구
+  ```bash
+  # Vite + Vue 프로젝트 생성
+  pnpm create vite@latest frontend -- --template vue
+  ```
+- **Node.js 18+**: LTS 버전 사용 권장
+- **pnpm**: 효율적인 디스크 공간 사용과 빠른 설치 속도
+
+### 2. 핵심 프레임워크
+- **Vue 3.4+**: Composition API와 `<script setup>` 문법 사용
+  ```javascript
+  // main.js
+  import { createApp } from 'vue'
+  import { createVuetify } from 'vuetify'
+  import App from './App.vue'
+  
+  const app = createApp(App)
+  const vuetify = createVuetify()
+  
+  app.use(vuetify).mount('#app')
+  ```
+
+### 3. UI 프레임워크 및 스타일링
+- **Vuetify 3.x**: Material Design 기반 UI 컴포넌트 라이브러리
+  ```bash
+  pnpm add vuetify
+  pnpm add -D vite-plugin-vuetify
+  ```
+- **Material Design Icons**: `@mdi/font` 또는 `@mdi/js` 사용
+- **CSS**: Vuetify의 내장 유틸리티 클래스 활용
+
+### 4. 라우팅 및 상태 관리
+- **Vue Router 4.x**: SPA 라우팅
+  ```javascript
+  import { createRouter, createWebHistory } from 'vue-router'
+  ```
+- **Pinia 2.x**: 직관적이고 타입 안전한 상태 관리
+  ```javascript
+  import { defineStore } from 'pinia'
+  ```
+
+### 5. HTTP 통신
+- **Axios**: Promise 기반 HTTP 클라이언트
+  ```javascript
+  import axios from 'axios'
+  
+  const api = axios.create({
+    baseURL: '/api',
+    timeout: 10000
+  })
+  ```
+
+## Vite 설정 (vite.config.js)
+
+```javascript
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
+import { fileURLToPath, URL } from 'node:url'
+
+export default defineConfig({
+  plugins: [
+    vue({
+      template: { transformAssetUrls }
+    }),
+    vuetify({
+      autoImport: true,
+      styles: {
+        configFile: 'src/styles/settings.scss'
+      }
+    })
+  ],
+  resolve: {
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url))
+    }
+  },
+  server: {
+    port: 3000,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true
+      }
+    }
+  }
+})
+```
+
+## 프로젝트 구조 및 개발 패턴
+
+### 1. Composition API 패턴
+```vue
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+import { useStore } from '@/stores/aggregate'
+
+// Props 정의
+const props = defineProps({
+  title: String
+})
+
+// 반응형 상태
+const count = ref(0)
+const doubleCount = computed(() => count.value * 2)
+
+// Store 사용
+const store = useStore()
+
+// 생명주기 훅
+onMounted(async () => {
+  await store.fetchData()
+})
+</script>
+```
+
+### 2. Vuetify 컴포넌트 활용
+```vue
+<template>
+  <v-container>
+    <v-row>
+      <v-col cols="12" md="6">
+        <v-card>
+          <v-card-title>{{ title }}</v-card-title>
+          <v-card-text>
+            <v-btn @click="handleClick" color="primary">
+              클릭
+            </v-btn>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
+</template>
+```
+
+### 3. API 서비스 패턴
+```javascript
+// services/aggregate.service.js
+import api from '@/services/api'
+
+export const aggregateService = {
+  async getAll() {
+    const { data } = await api.get('/aggregates')
+    return data
+  },
+  
+  async create(payload) {
+    const { data } = await api.post('/aggregates', payload)
+    return data
+  },
+  
+  async update(id, payload) {
+    const { data } = await api.put(`/aggregates/${id}`, payload)
+    return data
+  },
+  
+  async delete(id) {
+    await api.delete(`/aggregates/${id}`)
+  }
+}
+```
+
+## 개발 도구 및 설정
+
+### 1. VS Code 확장 프로그램
+- Vue - Official
+- Vetur (Vue 2) 또는 Volar (Vue 3)
+- ESLint
+- Prettier
+
+### 2. ESLint 설정 (.eslintrc.js)
+```javascript
+module.exports = {
+  env: {
+    node: true,
+  },
+  extends: [
+    'eslint:recommended',
+    'plugin:vue/vue3-recommended',
+  ],
+  rules: {
+    'vue/multi-word-component-names': 'off'
+  }
+}
+```
+
+### 3. 개발 스크립트 (package.json)
+```json
+{
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
+  }
+}
+```
+
+## 성능 최적화 팁
+
+1. **컴포넌트 지연 로딩**
+   ```javascript
+   const AdminPage = () => import('./views/AdminPage.vue')
+   ```
+
+2. **Vite의 자동 임포트 활용**
+   - Vuetify 컴포넌트는 자동으로 트리쉐이킹됨
+
+3. **이미지 최적화**
+   - Vite의 이미지 임포트 기능 활용
+   - WebP 포맷 사용 권장
+
+## 배포 고려사항
+
+1. **빌드 최적화**
+   ```bash
+   pnpm run build
+   ```
+
+2. **환경 변수 관리**
+   - `.env.development`
+   - `.env.production`
+
+3. **정적 자산 배포**
+   - `dist` 폴더를 CDN 또는 정적 호스팅 서비스에 배포

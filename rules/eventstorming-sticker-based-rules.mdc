@@ -1,0 +1,73 @@
+---
+
+alwaysApply: false
+---
+
+Code generated based on eventstorming stickers must follow these requirements:
+
+## Event
+
+1. Reference Metadata
+Events use metadata under 'events' to publish events when business logic processing is completed.
+
+2. Generated Files
+Event.java
+Filename: Event sticker name.java
+Structure:
+- fieldDescriptors declaration
+- Constructor that takes an Aggregate as a parameter
+- Default constructor declaration
+
+## Command
+
+1. Reference Metadata
+Commands use metadata under 'commands', and isRestRepository determines whether to use CRUD API or Extended API. When using Extended API, a command file corresponding to the DTO should be generated through fieldDescriptors.
+
+2. Generated Files
+Command.java
+Filename: Command sticker name + Command.java
+Creation condition: When isRestRepository is false
+Structure:
+- fieldDescriptors declaration
+
+Controller.java
+Filename: Aggregate sticker name + Controller.java
+Structure:
+- If there are commands using extended api, generate extended api code based on controllerInfo and the created Command file
+- For default api, create file and handle CRUD with Repository pattern
+- All of the above requirements should be generated in a single Controller.java file.
+
+## Policy
+
+1. Reference Metadata and Roles
+
+It processes domain events defined in the policies.incomingRelations.source resource of the model metadata. It receives domain events using KafkaListener and generates the received domain event code.
+A port method should be declared within the Aggregate Root Entity with the Policy name, and business logic should be implemented by passing the received event.
+
+2. Generated Files
+PolicyHandler.java
+Filename: PolicyHandler.java
+Structure:
+- Declaration of events being listened to
+- Declaration of connected Policies according to event declarations
+- Call to the port method of the Aggregate generated based on the Policy
+- If no policies exist, generate the default file.
+
+## Aggregate
+
+1. Reference Metadata
+Aggregates should be generated based on metadata in the 'aggregates' section, using fieldDescriptors that represent attributes, and the class diagram relationships (Enumeration, ValueObject, Entity) that exist in aggregateRoot.entities.relations.
+
+2. Generated Files
+AggregateRoot.java
+Filename: AggregateName.java
+Structure:
+- Property declarations based on fieldDescriptors
+- lifeCycle(Only generate when the command's metadata isRestRepository is false.)
+- Declaration of business logic methods in the inbound adapter (extended API controller, eventListener policyHandler) that publishes events
+
+Repository.java
+Filename: AggregateName + Repository.java
+Structure:
+- Extends JPARepository
+- When parameters from views or ReadModels exist, write query statements referencing queryOption
